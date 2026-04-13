@@ -2,6 +2,7 @@
 """Module contains the function poly_derivative
 that calculates the derivative of a polynomial"""
 
+
 def poly_derivative(poly):
     """Calculates the derivative of a polynomial"""
     new_list = []
