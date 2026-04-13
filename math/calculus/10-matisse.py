@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-
+"""Module contains the function poly_derivative
+that calculates the derivative of a polynomial"""
 
 def poly_derivative(poly):
+    """Calculates the derivative of a polynomial"""
     new_list = []
     if not isinstance(poly, list) or len(poly) == 0:
         return None
