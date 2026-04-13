@@ -8,4 +8,6 @@ def poly_derivative(poly):
     for i in range(len(poly)):
         new_list.append(poly[i]*(i))
     del new_list[0]
+    if len(new_list) == 0:
+        return [0]
     return new_list
