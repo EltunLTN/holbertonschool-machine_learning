@@ -3,7 +3,7 @@
 
 def poly_derivative(poly):
     new_list = []
-    if not isinstance(poly, list):
+    if not isinstance(poly, list) or len(poly) == 0:
         return None
     for i in range(len(poly)):
         new_list.append(poly[i]*(i))
