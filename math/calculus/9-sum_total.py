@@ -1,3 +1,7 @@
 #!/usr/bin/env python3
+"""Sum total"""
+
+
 def summation_i_squared(n):
+    """sum total"""
     return n*(n+1)*(2*n+1)/6
