@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Adding array"""
+"""Adding array function."""
 
 
 def add_arrays(arr1, arr2):
-    """add"""
+    """Adding array function."""
     if len(arr1) != len(arr2):
         return None
     list = []
