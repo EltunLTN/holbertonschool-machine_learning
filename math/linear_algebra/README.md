@@ -43,14 +43,3 @@ matrix multiplication, and matrix operations on higher dimensions.
 
 ## Usage
 
-Run Python files with:
-
-```bash
-python3 <filename.py>
-```
-
-Example:
-
-```bash
-python3 8-ridin_bareback.py
-```
