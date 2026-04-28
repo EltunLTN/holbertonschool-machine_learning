@@ -4,8 +4,10 @@
 
 def determinant(matrix):
     """Calculate the determinant of a matrix."""
-    if not isinstance(matrix, list) or not all(isinstance(r, list) for r in matrix):
+    if not isinstance(matrix, list) or not all(
+            isinstance(r, list) for r in matrix):
         raise TypeError("matrix must be a list of lists")
+
     if matrix == [[]]:
         return 1
     if any(len(row) != len(matrix) for row in matrix):
