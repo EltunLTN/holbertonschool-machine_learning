@@ -70,7 +70,8 @@ def inverse(matrix):
         raise ValueError("matrix must be a non-empty square matrix")
     adj = adjugate(matrix)
     det = determinant(matrix)
-
+    if det == 0:
+        return None
     return [[adj[i][j] / det
              for i in range(len(matrix))]
-             for j in range(len(matrix))]
+            for j in range(len(matrix))]
