@@ -50,8 +50,13 @@ def cofactor(matrix):
 
 
 def adjugate(matrix):
-    new = []
-    for i in range(len(matrix)):
-        for j in range(len(matrix)):
-            new.append(matrix[j][i])
-    return new
+    """Calculate the adjugate matrix of a matrix."""
+    if not isinstance(matrix, list) or not all(
+            isinstance(r, list) for r in matrix):
+        raise TypeError("matrix must be a list of lists")
+    if len(matrix) == 0 or any(len(row) != len(matrix) for row in matrix):
+        raise ValueError("matrix must be a non-empty square matrix")
+    cofactor_matrix = cofactor(matrix)
+    return [[cofactor_matrix[j][i]
+             for j in range(len(matrix))]
+            for i in range(len(matrix))]
