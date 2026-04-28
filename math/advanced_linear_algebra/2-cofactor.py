@@ -35,6 +35,7 @@ def minor(matrix):
         result.append(row)
     return result
 
+
 def cofactor(matrix):
     """Calculate the cofactor matrix of a matrix."""
     if not isinstance(matrix, list) or not all(
