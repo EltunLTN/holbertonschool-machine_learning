@@ -47,10 +47,11 @@ def cofactor(matrix):
     return [[minor_matrix[i][j] * ((-1) ** (i + j))
              for j in range(len(matrix))]
             for i in range(len(matrix))]
+
+
 def adjugate(matrix):
     new = []
     for i in range(len(matrix)):
         for j in range(len(matrix)):
             new.append(matrix[j][i])
     return new
-            
