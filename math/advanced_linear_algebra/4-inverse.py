@@ -63,15 +63,16 @@ def adjugate(matrix):
 
 
 def inverse(matrix):
-    """Finding inverse matrix"""
-    if not isinstance(matrix, list) or not all(isinstance(r, list) for r in matrix):
+    """Calculate the inverse of a matrix."""
+    if not isinstance(matrix, list) or not all(
+            isinstance(r, list) for r in matrix):
         raise TypeError("matrix must be a list of lists")
     if len(matrix) == 0 or any(len(r) != len(matrix) for r in matrix):
         raise ValueError("matrix must be a non-empty square matrix")
-    adj = adjugate(matrix)
     det = determinant(matrix)
     if det == 0:
         return None
+    adj = adjugate(matrix)
     return [[adj[i][j] / det
-             for i in range(len(matrix))]
-            for j in range(len(matrix))]
+             for j in range(len(matrix))]
+            for i in range(len(matrix))]
