@@ -7,6 +7,7 @@ class Normal:
 
     def __init__(self, data=None, mean=0., stddev=1.):
         """Initialize Normal distribution"""
+
         if data is None:
             if stddev <= 0:
                 raise ValueError("stddev must be a positive value")
@@ -26,14 +27,24 @@ class Normal:
             variance = sum((x - self.mean) ** 2 for x in data) / len(data)
             self.stddev = float(variance ** 0.5)
 
-    def z_score(self, x):
+    def pdf(self, x):
         """
-        Calculates the z-score of a given x-value
-        """
-        return (x - self.mean) / self.stddev
+        Calculates the PDF for a given x-value
 
-    def x_value(self, z):
+        Args:
+            x (float): x-value
+
+        Returns:
+            float: PDF value
         """
-        Calculates the x-value of a given z-score
-        """
-        return self.mean + z * self.stddev
+
+        if self.stddev <= 0:
+            return 0
+
+        e = 2.7182818285
+        pi = 3.1415926536
+
+        exponent = -((x - self.mean) ** 2) / (2 * (self.stddev ** 2))
+        denominator = self.stddev * (2 * pi) ** 0.5
+
+        return (1 / denominator) * (e ** exponent)
