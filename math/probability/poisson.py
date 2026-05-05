@@ -21,28 +21,37 @@ class Poisson:
             self.lambtha = float(sum(data) / len(data))
 
     def pmf(self, k):
+        """Calculates the PMF for a given number of successes"""
+        k = int(k)
+
+        if k < 0:
+            return 0
+
+        factorial = 1
+        for i in range(1, k + 1):
+            factorial *= i
+
+        e = 2.7182818285
+
+        return ((self.lambtha ** k) * (e ** (-self.lambtha))) / factorial
+
+    def cdf(self, k):
         """
-        Calculates the PMF for a given number of successes
+        Calculates the CDF for a given number of successes
 
         Parameters:
         k (int): number of successes
 
         Returns:
-        float: PMF value for k
+        float: CDF value for k
         """
-        # Convert k to integer
         k = int(k)
 
-        # Out of range
         if k < 0:
             return 0
 
-        # Compute factorial manually (no math.factorial)
-        factorial = 1
-        for i in range(1, k + 1):
-            factorial *= i
+        cdf = 0
+        for i in range(0, k + 1):
+            cdf += self.pmf(i)
 
-        # Compute e^-lambtha (approximate e)
-        e = 2.7182818285
-
-        return ((self.lambtha ** k) * (e ** (-self.lambtha))) / factorial
+        return cdf
