@@ -1,46 +1,48 @@
 #!/usr/bin/env python3
-"""Coninuous posterior"""
+"""Continuous Posterior Probability"""
 
 from scipy import special
-import numpy as np
 
 
 def posterior(x, n, p1, p2):
-    """
-    continuous posterior
+    """Calculates the posterior probability that p is within [p1, p2].
+
+    With a uniform prior, the posterior follows a Beta(x+1, n-x+1)
+    distribution. The probability within a range is the CDF difference
+    computed via the regularized incomplete beta function.
+
     Args:
-        x: the number of patients that develop severe side effects
-        n:  the total number of patients observed
-        p1: he lower bound on the range
-        p2: the upper bound on the range
-    Returns: posterior probability that p is within the range
-            [p1, p2] given x and n
+        x:  number of patients that develop severe side effects
+        n:  total number of patients observed
+        p1: lower bound on the range
+        p2: upper bound on the range
+
+    Returns:
+        Posterior probability that p is within [p1, p2] given x and n
     """
-    if not isinstance(n, int) or n < 1:
+    if not isinstance(n, int) or n <= 0:
         raise ValueError("n must be a positive integer")
+
     if not isinstance(x, int) or x < 0:
         raise ValueError(
-            "x must be an integer that is greater than or equal to 0")
+            "x must be an integer that is greater than or equal to 0"
+        )
+
     if x > n:
         raise ValueError("x cannot be greater than n")
-    if type(p1) is not float or not 0 <= p1 <= 1:
+
+    if not isinstance(p1, float) or not (0 <= p1 <= 1):
         raise ValueError("p1 must be a float in the range [0, 1]")
-    if type(p2) is not float or not 0 <= p2 <= 1:
+
+    if not isinstance(p2, float) or not (0 <= p2 <= 1):
         raise ValueError("p2 must be a float in the range [0, 1]")
+
     if p2 <= p1:
         raise ValueError("p2 must be greater than p1")
 
-    def likelihood(x, n, P):
-        return (special.factorial(n) / (special.factorial(x) *
-                                        special.factorial(n - x))) \
-               * (P ** x) * ((1 - P) ** (n - x))
-
-    P = (x - (p1 + p2)) / (n - (p1 + p2))
-
-    like = likelihood(x, n, P)
-    Pr = special.beta(1, 1)
-    intersection = like * Pr
-    marginal = np.sum(intersection)
-    pos = intersection / marginal
-
-    return pos
+    # With uniform prior, posterior is Beta(x+1, n-x+1)
+    # P(p1 <= p <= p2) = CDF(p2) - CDF(p1)
+    # special.betainc(a, b, x) = regularized incomplete beta = Beta CDF
+    a = x + 1
+    b = n - x + 1
+    return special.betainc(a, b, p2) - special.betainc(a, b, p1)
