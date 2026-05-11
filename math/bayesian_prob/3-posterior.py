@@ -50,9 +50,9 @@ def posterior(x, n, P, Pr):
     # --- Calculation ---
 
     # Binomial coefficient: C(n, x) using numpy only
-    # np.arange + np.prod avoids any import beyond numpy
-    coefficient = (np.prod(np.arange(x + 1, n + 1)) /
-                   np.prod(np.arange(1, n - x + 1)))
+    # dtype=float prevents integer overflow for large n
+    coefficient = (np.prod(np.arange(x + 1, n + 1, dtype=float)) /
+                   np.prod(np.arange(1, n - x + 1, dtype=float)))
 
     # Likelihood: P(x | p) for each p in P
     likelihood = coefficient * (P ** x) * ((1 - P) ** (n - x))
