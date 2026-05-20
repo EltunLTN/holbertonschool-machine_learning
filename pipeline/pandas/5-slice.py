@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""slice the pd.DataFrame along the columns High,
-Low, Close, and Volume_BTC, taking every 60th row"""
-import pandas as pd
+"""Module for slicing a DataFrame."""
 
 
-from_file = __import__('2-from_file').from_file
-df = from_file('coinbaseUSD_1-min_data_2014-12-01_to_2019-01-09.csv', ',')
-df = df.iloc[::60, 2:6]
-print(df.tail())
+def slice(df):
+    """Extract specific columns and select every 60th row.
+
+    Args:
+        df: pd.DataFrame containing High, Low, Close, and Volume_(BTC) columns.
+
+    Returns:
+        Sliced pd.DataFrame with every 60th row of the selected columns.
+    """
+    return df[['High', 'Low', 'Close', 'Volume_(BTC)']].iloc[::60]
