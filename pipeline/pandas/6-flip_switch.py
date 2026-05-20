@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-Module that flips and switches a DataFrame.
+Defines the flip_switch function for sorting and transposing a DataFrame.
 """
-
 import pandas as pd
 
 
 def flip_switch(df):
     """
-    Sorts the DataFrame in reverse chronological order
-    and transposes it.
+    Sorts a DataFrame in reverse chronological order and transposes it.
 
     Args:
-        df (pd.DataFrame): Input DataFrame.
+        df (pd.DataFrame): The input DataFrame.
 
     Returns:
-        pd.DataFrame: Transformed DataFrame.
+        pd.DataFrame: The transformed DataFrame.
     """
-    return df.sort_index(ascending=False).transpose()
+    # Sort the index in descending order to get reverse chronological order,
+    # then transpose using .T (or .transpose())
+    return df.sort_index(ascending=False).T
