@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Module for flipping and switching a DataFrame."""
-import pandas as pd
 
 
 def flip_switch(df):
