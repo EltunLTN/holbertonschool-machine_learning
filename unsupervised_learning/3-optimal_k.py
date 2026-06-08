@@ -1,30 +1,44 @@
 #!/usr/bin/env python3
-"""Module for determining the optimal number of clusters for K-Means."""
+"""Module for determining the optimal number of clusters."""
+
 from sklearn import metrics
 K_Means = __import__('2-k_means').K_Means
 
 
 def optimal_k(X, max_clusters, random_state):
-    """Evaluate K-Means clustering quality using inertia and silhouette scores.
+    """
+    Determines the optimal number of clusters for K-Means.
 
     Args:
-        X (numpy.ndarray): Tabular data of shape (n_samples, n_features).
-        max_clusters (int): Maximum number of clusters to evaluate (>=2).
-        random_state (int): Random seed for reproducibility.
+        X: numpy.ndarray of shape (n_samples, n_features)
+        max_clusters: maximum number of clusters to test
+        random_state: random seed
 
     Returns:
-        list[int]: Evaluated cluster numbers from 2 to max_clusters.
-        list[float]: Inertia values for each cluster number (elbow method).
-        list[float]: Silhouette scores for each cluster number.
+        ks: list of cluster numbers tested
+        inertia_values: list of inertia values
+        silhouette_values: list of silhouette scores
     """
-    ks = list(range(2, max_clusters + 1))
+
+    ks = []
     inertia_values = []
     silhouette_values = []
 
-    for k in ks:
-        model = K_Means(X, n_clusters=k, random_state=random_state)
-        inertia_values.append(model.inertia_)
-        score = metrics.silhouette_score(X, model.labels_)
-        silhouette_values.append(score)
+    for k in range(2, max_clusters + 1):
+        kmeans = K_Means(
+            X,
+            n_clusters=k,
+            random_state=random_state
+        )
+
+        ks.append(k)
+        inertia_values.append(kmeans.inertia_)
+
+        silhouette_values.append(
+            metrics.silhouette_score(
+                X,
+                kmeans.labels_
+            )
+        )
 
     return ks, inertia_values, silhouette_values
