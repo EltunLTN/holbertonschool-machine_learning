@@ -6,7 +6,7 @@ Apply_PCA = __import__('1-pca').Apply_PCA
 
 
 def Agglomerative_Clustering(X, n_clusters, random_state, n_components,
-                              use_pca_data=True):
+                             use_pca_data=True):
     """Perform Agglomerative Hierarchical Clustering on tabular data.
 
     Args:
@@ -23,7 +23,7 @@ def Agglomerative_Clustering(X, n_clusters, random_state, n_components,
     """
     if use_pca_data:
         X_fit, _ = Apply_PCA(X, n_components=n_components,
-                              random_state=random_state)
+                             random_state=random_state)
     else:
         X_fit = X
 
