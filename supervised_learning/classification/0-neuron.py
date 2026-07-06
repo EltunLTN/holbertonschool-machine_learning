@@ -2,6 +2,7 @@
 import numpy as np
 """Class that defines a single neuron performing binary classification"""
 
+
 class Neuron:
     """Class that defines a single neuron performing binary classification"""
 
