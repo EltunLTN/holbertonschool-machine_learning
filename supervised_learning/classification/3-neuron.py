@@ -47,7 +47,6 @@ class Neuron:
         self.__A = 1 / (1 + np.exp(-z))  # Sigmoid activation function
         return self.__A
 
-   
     def cost(self, Y, A):
         """
         Y: correct labels, shape (1, m)
