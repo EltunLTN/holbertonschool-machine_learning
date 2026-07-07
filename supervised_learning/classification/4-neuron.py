@@ -73,7 +73,8 @@ class Neuron:
 
         Returns:
         tuple: (prediction, cost)
-            - prediction (numpy.ndarray): Predicted labels (1, m) with values 0 or 1.
+            - prediction (numpy.ndarray): Predicted
+            labels (1, m) with values 0 or 1.
             - cost (float): Cost of the network.
         """
         A = self.forward_prop(X)
