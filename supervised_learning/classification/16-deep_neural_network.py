@@ -33,28 +33,28 @@ class DeepNeuralNetwork:
         if not all(isinstance(x, int) and x > 0 for x in layers):
             raise TypeError("layers must be a list of positive integers")
 
-        self.__L = len(layers)
-        self.__cache = {}
-        self.__weights = {}
+        self.L = len(layers)
+        self.cache = {}
+        self.weights = {}
 
-        for l in range(self.__L):
+        for l in range(self.L):
             layer_input = nx if l == 0 else layers[l - 1]
-            self.__weights['W' + str(l + 1)] = (
+            self.weights['W' + str(l + 1)] = (
                 np.random.randn(layers[l], layer_input) * np.sqrt(2 / layer_input)
             )
-            self.__weights['b' + str(l + 1)] = np.zeros((layers[l], 1))
+            self.weights['b' + str(l + 1)] = np.zeros((layers[l], 1))
 
     @property
     def L(self):
         """Number of layers in the neural network."""
-        return self.__L
+        return self.L
 
     @property
     def cache(self):
         """Dictionary to hold all intermediary values of the network."""
-        return self.__cache
+        return self.cache
 
     @property
     def weights(self):
         """Dictionary to hold all weights and biases of the network."""
-        return self.__weights
+        return self.weights
