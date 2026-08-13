@@ -33,39 +33,39 @@ class DeepNeuralNetwork:
         if not all(isinstance(x, int) and x > 0 for x in layers):
             raise TypeError("layers must be a list of positive integers")
 
-         self.L = len(layers)
-                self.cache = {}
-                self.weights = {}
-                
-                # Initialize weights and biases
-                # He et al. initialization: np.random.randn(...) * np.sqrt(2 / prev_layer_nodes)
-                for l in range(self.L):
-                    prev_nodes = nx if l == 0 else layers[l - 1]
-                    curr_nodes = layers[l]
-                    
-                    self.weights[f'W{l + 1}'] = np.random.randn(curr_nodes, prev_nodes) * np.sqrt(2 / prev_nodes)
-                    self.weights[f'b{l + 1}'] = np.zeros((curr_nodes, 1))
+        self.L = len(layers)
+        self.cache = {}
+        self.weights = {}
         
-            @property
-            def L(self):
-                return self.__L
-        
-            @L.setter
-            def L(self, value):
-                self.__L = value
-        
-            @property
-            def cache(self):
-                return self.__cache
-        
-            @cache.setter
-            def cache(self, value):
-                self.__cache = value
-        
-            @property
-            def weights(self):
-                return self.__weights
-        
-            @weights.setter
-            def weights(self, value):
-                self.__weights = value
+        # Initialize weights and biases
+        # He et al. initialization: np.random.randn(...) * np.sqrt(2 / prev_layer_nodes)
+        for l in range(self.L):
+            prev_nodes = nx if l == 0 else layers[l - 1]
+            curr_nodes = layers[l]
+            
+            self.weights[f'W{l + 1}'] = np.random.randn(curr_nodes, prev_nodes) * np.sqrt(2 / prev_nodes)
+            self.weights[f'b{l + 1}'] = np.zeros((curr_nodes, 1))
+
+        @property
+        def L(self):
+            return self.__L
+
+        @L.setter
+        def L(self, value):
+            self.__L = value
+
+        @property
+        def cache(self):
+            return self.__cache
+
+        @cache.setter
+        def cache(self, value):
+            self.__cache = value
+
+        @property
+        def weights(self):
+            return self.__weights
+
+        @weights.setter
+        def weights(self, value):
+            self.__weights = value
