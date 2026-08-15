@@ -1,124 +1,206 @@
 #!/usr/bin/env python3
-"""
-Decision Tree printing module.
-"""
+"""Defines a deep neural network performing binary/multiclass classification"""
 
 import numpy as np
+import matplotlib.pyplot as plt
+import pickle
+import os
 
 
-class Node:
-    """
-    Decision tree internal node.
-    """
+class DeepNeuralNetwork:
+    """Deep Neural Network for binary/multiclass classification"""
 
-    def __init__(self, feature=None, threshold=None,
-                 left_child=None, right_child=None,
-                 is_root=False, depth=0):
-        self.feature = feature
-        self.threshold = threshold
-        self.left_child = left_child
-        self.right_child = right_child
-        self.is_leaf = False
-        self.is_root = is_root
-        self.depth = depth
+    def __init__(self, nx, layers, activation='sig'):
+        """
+        Class constructor
 
-    # ---------- PRINT HELPERS ----------
+        nx: number of input features
+        layers: list representing number of nodes in each layer
+        activation: activation function for hidden layers ('sig' or 'tanh')
+        """
+        if type(nx) is not int:
+            raise TypeError("nx must be an integer")
+        if nx < 1:
+            raise ValueError("nx must be a positive integer")
+        if type(layers) is not list or len(layers) == 0:
+            raise TypeError("layers must be a list of positive integers")
+        if activation != 'sig' and activation != 'tanh':
+            raise ValueError("activation must be 'sig' or 'tanh'")
 
-    def left_child_add_prefix(self, text):
-        """Adds standard prefix lines for a left child node."""
-        lines = text.split("\n")
-        new_text = "    +---> " + lines[0] + "\n"
-        for x in lines[1:]:
-            if x:
-                pfx = "    |      " if x.startswith(" ") else "    |  "
-                new_text += (pfx + x) + "\n"
-        return new_text
+        self.__L = len(layers)
+        self.__cache = {}
+        self.__weights = {}
+        self.__activation = activation
 
-    def right_child_add_prefix(self, text):
-        """Adds trailing indentation prefix lines for a right child node."""
-        lines = text.split("\n")
-        new_text = "    +---> " + lines[0] + "\n"
-        for x in lines[1:]:
-            if x:
-                pfx = "           " if x.startswith(" ") else "       "
-                new_text += (pfx + x) + "\n"
-        return new_text
+        for l in range(self.__L):
+            if type(layers[l]) is not int or layers[l] < 1:
+                raise TypeError("layers must be a list of positive integers")
 
-    # ---------- STRING FORMAT ----------
-
-    def __str__(self):
-        """Returns the string representation of a node and its children."""
-        if self.is_root:
-            out = (f"root [feature={self.feature}, "
-                   f"threshold={self.threshold}]\n")
-        else:
-            out = f"node [feature={self.feature}, threshold={self.threshold}]"
-
-        if self.left_child is not None:
-            left_str = str(self.left_child)
-            if self.is_root:
-                out += ("    +---> " +
-                        left_str.replace("\n", "\n    |  ") + "\n")
+            if l == 0:
+                prev = nx
             else:
-                lines = left_str.split("\n")
-                out += "\n    +---> " + lines[0]
-                for x in lines[1:]:
-                    if x:
-                        out += "\n    |  " + x
+                prev = layers[l - 1]
 
-        if self.right_child is not None:
-            right_str = str(self.right_child)
-            if self.is_root:
-                out += ("    +---> " +
-                        right_str.replace("\n", "\n       ") + "\n")
+            self.__weights["W" + str(l + 1)] = (
+                np.random.randn(layers[l], prev) * np.sqrt(2 / prev)
+            )
+            self.__weights["b" + str(l + 1)] = np.zeros((layers[l], 1))
+
+    @property
+    def L(self):
+        return self.__L
+
+    @property
+    def cache(self):
+        return self.__cache
+
+    @property
+    def weights(self):
+        return self.__weights
+
+    @property
+    def activation(self):
+        return self.__activation
+
+    def forward_prop(self, X):
+        """
+        Calculates the forward propagation of the neural network
+
+        X: numpy.ndarray with shape (nx, m) containing the input data
+        Returns: the output of the neural network and the cache, respectively
+        """
+        self.__cache["A0"] = X
+
+        for l in range(1, self.__L + 1):
+            W = self.__weights["W" + str(l)]
+            b = self.__weights["b" + str(l)]
+            A_prev = self.__cache["A" + str(l - 1)]
+
+            Z = np.matmul(W, A_prev) + b
+
+            if l == self.__L:
+                # Output layer: softmax (multiclass)
+                t = np.exp(Z - np.max(Z, axis=0, keepdims=True))
+                A = t / np.sum(t, axis=0, keepdims=True)
             else:
-                lines = right_str.split("\n")
-                out += "\n    +---> " + lines[0]
-                for x in lines[1:]:
-                    if x:
-                        out += "\n       " + x
+                # Hidden layers: sig or tanh
+                if self.__activation == 'sig':
+                    A = 1 / (1 + np.exp(-Z))
+                else:
+                    A = np.tanh(Z)
 
-        return out.strip("\n")
+            self.__cache["A" + str(l)] = A
 
+        return self.__cache["A" + str(self.__L)], self.__cache
 
-class Leaf(Node):
-    """
-    Leaf node.
-    """
+    def cost(self, Y, A):
+        """
+        Calculates the cost of the model using categorical cross-entropy
 
-    def __init__(self, value, depth=None):
-        super().__init__()
-        self.value = value
-        self.is_leaf = True
-        self.depth = depth
+        Y: numpy.ndarray shape (classes, m) - one-hot correct labels
+        A: numpy.ndarray shape (classes, m) - activated output
+        Returns: the cost
+        """
+        m = Y.shape[1]
+        cost = -(1 / m) * np.sum(Y * np.log(A))
+        return cost
 
-    def __str__(self):
-        """Returns string representation of a Leaf."""
-        return f"leaf [value={self.value}]"
+    def evaluate(self, X, Y):
+        """
+        Evaluates the neural network's predictions
 
-    def max_depth_below(self):
-        """Returns max depth below leaf."""
-        return self.depth
+        X: numpy.ndarray shape (nx, m) - input data
+        Y: numpy.ndarray shape (classes, m) - one-hot correct labels
+        Returns: the neuron's prediction and the cost of the network
+        """
+        A, _ = self.forward_prop(X)
+        cost = self.cost(Y, A)
 
-    def count_nodes_below(self, only_leaves=False):
-        """Counts nodes below leaf."""
-        return 1
+        prediction = np.zeros_like(A)
+        prediction[np.argmax(A, axis=0), np.arange(A.shape[1])] = 1
 
+        return prediction, cost
 
-class Decision_Tree:
-    """
-    Decision tree container.
-    """
+    def gradient_descent(self, Y, cache, alpha=0.05):
+        """
+        Calculates one pass of gradient descent on the neural network
 
-    def __init__(self, root=None, max_depth=10,
-                 min_pop=1, seed=0,
-                 split_criterion="random"):
-        self.rng = np.random.default_rng(seed)
-        self.root = root if root else Node(is_root=True)
-        self.max_depth = max_depth
-        self.min_pop = min_pop
-        self.split_criterion = split_criterion
+        Y: numpy.ndarray shape (classes, m) - one-hot correct labels
+        cache: dictionary containing all intermediary values of the network
+        alpha: learning rate
+        Updates the private attribute __weights
+        """
+        m = Y.shape[1]
+        L = self.__L
 
-    def __str__(self):
-        """Returns string representation of the tree from the root."""
-        return self.root.__str__() + "\n"
+        dZ = cache["A" + str(L)] - Y
+
+        for l in range(L, 0, -1):
+            A_prev = cache["A" + str(l - 1)]
+            W = self.__weights["W" + str(l)]
+
+            dW = (1 / m) * np.matmul(dZ, A_prev.T)
+            db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
+
+            if l > 1:
+                if self.__activation == 'sig':
+                    deriv = A_prev * (1 - A_prev)
+                else:
+                    deriv = 1 - A_prev ** 2
+                dZ = np.matmul(W.T, dZ) * deriv
+
+            self.__weights["W" + str(l)] -= alpha * dW
+            self.__weights["b" + str(l)] -= alpha * db
+
+    def train(self, X, Y, iterations=5000, alpha=0.05,
+              verbose=True, graph=True, step=100):
+        """
+        Trains the deep neural network
+
+        X: numpy.ndarray shape (nx, m) - input data
+        Y: numpy.ndarray shape (classes, m) - one-hot correct labels
+        iterations: number of iterations to train over
+        alpha: learning rate
+        verbose: whether to print training info
+        graph: whether to plot training info
+        step: interval for verbose/graph updates
+        Returns: the evaluation of the training data after training
+        """
+        if type(iterations) is not int:
+            raise TypeError("iterations must be an integer")
+        if iterations <= 0:
+            raise ValueError("iterations must be a positive integer")
+        if type(alpha) is not float:
+            raise TypeError("alpha must be a float")
+        if alpha <= 0:
+            raise ValueError("alpha must be positive")
+        if verbose or graph:
+            if type(step) is not int:
+                raise TypeError("step must be an integer")
+            if step <= 0 or step > iterations:
+                raise ValueError("step must be positive and <= iterations")
+
+        costs = []
+        steps = []
+
+        for i in range(iterations + 1):
+            A, cache = self.forward_prop(X)
+
+            if i % step == 0 or i == iterations:
+                cost = self.cost(Y, A)
+                costs.append(cost)
+                steps.append(i)
+                if verbose:
+                    print("Cost after {} iterations: {}".format(i, cost))
+
+            if i < iterations:
+                self.gradient_descent(Y, cache, alpha)
+
+        if graph:
+            plt.plot(steps, costs, 'b-')
+            plt.xlabel('iteration')
+            plt.ylabel('cost')
+            plt.title('Training Cost')
+            plt.show()
+
+        return self.evaluate(X, Y)

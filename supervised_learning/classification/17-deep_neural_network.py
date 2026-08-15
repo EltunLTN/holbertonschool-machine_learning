@@ -1,50 +1,43 @@
+#!/usr/bin/env python3
+"""Defines a deep neural network performing binary classification"""
+
 import numpy as np
 
+
 class DeepNeuralNetwork:
-    """
-    Defines a deep neural network performing binary classification.
-    """
+    """Deep Neural Network for binary classification"""
 
     def __init__(self, nx, layers):
         """
-        Class constructor.
+        Class constructor
 
-        Parameters:
-        nx (int): Number of input features.
-        layers (list): List representing the number of nodes in each layer.
-
-        Raises:
-        TypeError: If nx is not an integer.
-        ValueError: If nx is less than 1.
-        TypeError: If layers is not a list or is empty.
-        TypeError: If elements in layers are not all positive integers.
+        nx: number of input features
+        layers: list representing number of nodes in each layer
         """
-        # Validate nx
-        if not isinstance(nx, int):
+        if type(nx) is not int:
             raise TypeError("nx must be an integer")
         if nx < 1:
             raise ValueError("nx must be a positive integer")
-
-        # Validate layers
-        if not isinstance(layers, list) or len(layers) == 0:
-            raise TypeError("layers must be a list of positive integers")
-        if not all(isinstance(x, int) and x > 0 for x in layers):
+        if type(layers) is not list or len(layers) == 0:
             raise TypeError("layers must be a list of positive integers")
 
-        self.__L = len(layers)  # number of layers
-        self.__cache = {}       # dictionary to hold intermediary values
-        self.__weights = {}     # dictionary to hold weights and biases
+        self.__L = len(layers)
+        self.__cache = {}
+        self.__weights = {}
 
-        for l in range(self.__L):
-            
-            layer_size = layers[l]
-            prev_layer_size = nx if l == 0 else layers[l - 1]
+        for l in range(self.L):
+            if type(layers[l]) is not int or layers[l] < 1:
+                raise TypeError("layers must be a list of positive integers")
 
-            # He initialization for weights
-            self.__weights[f"W{l + 1}"] = (np.random.randn(layer_size, prev_layer_size) *
-                                        np.sqrt(2 / prev_layer_size))
-            # Biases initialized to zeros
-            self.__weights[f"b{l + 1}"] = np.zeros((layer_size, 1))
+            if l == 0:
+                prev = nx
+            else:
+                prev = layers[l - 1]
+
+            self.weights["W" + str(l + 1)] = (
+                np.random.randn(layers[l], prev) * np.sqrt(2 / prev)
+            )
+            self.weights["b" + str(l + 1)] = np.zeros((layers[l], 1))
 
     @property
     def L(self):
