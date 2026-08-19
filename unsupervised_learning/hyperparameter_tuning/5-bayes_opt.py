@@ -33,8 +33,8 @@ class BayesianOptimization:
         self.f = f
         self.gp = GP(X_init, Y_init, l, sigma_f)
         min_bound, max_bound = bounds
-        self.X_s = np.linspace(min_bound, max_bound, ac_samples).reshape(-1,
-                                                                           1)
+        X_s = np.linspace(min_bound, max_bound, ac_samples)
+        self.X_s = X_s.reshape(-1, 1)
         self.xsi = xsi
         self.minimize = minimize
 
@@ -63,8 +63,9 @@ class BayesianOptimization:
             mask = sigma > 0
             Z[mask] = imp[mask] / sigma[mask]
             EI = np.zeros_like(sigma)
-            EI[mask] = (imp[mask] * norm.cdf(Z[mask]) +
-                        sigma[mask] * norm.pdf(Z[mask]))
+            term1 = imp[mask] * norm.cdf(Z[mask])
+            term2 = sigma[mask] * norm.pdf(Z[mask])
+            EI[mask] = term1 + term2
 
         X_next = self.X_s[np.argmax(EI)]
 
