@@ -25,13 +25,11 @@ class BayesianOptimization:
         """Initialize Bayesian Optimization."""
         self.f = f
         self.gp = GP(X_init, Y_init, l=l, sigma_f=sigma_f)
-
         self.X_s = np.linspace(
             bounds[0],
             bounds[1],
             ac_samples
         ).reshape(-1, 1)
-
         self.xsi = xsi
         self.minimize = minimize
 
@@ -47,14 +45,9 @@ class BayesianOptimization:
             improvement = mu - best - self.xsi
 
         sigma_safe = np.where(sigma == 0, 1e-10, sigma)
-
         Z = improvement / sigma_safe
 
-        EI = (
-            improvement * norm.cdf(Z) +
-            sigma_safe * norm.pdf(Z)
-        )
-
+        EI = improvement * norm.cdf(Z) + sigma_safe * norm.pdf(Z)
         EI = np.where(sigma == 0, 0, EI)
 
         X_next = self.X_s[np.argmax(EI)]
