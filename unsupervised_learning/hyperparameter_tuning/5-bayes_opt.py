@@ -66,11 +66,10 @@ class BayesianOptimization:
         for _ in range(iterations):
             X_next, _ = self.acquisition()
 
-            if np.any(np.isclose(self.gp.X, X_next)):
+            if np.any(np.all(np.isclose(self.gp.X, X_next), axis=1)):
                 break
 
             Y_next = self.f(X_next)
-
             self.gp.update(X_next, Y_next)
 
         if self.minimize:
@@ -78,7 +77,4 @@ class BayesianOptimization:
         else:
             index = np.argmax(self.gp.Y)
 
-        X_opt = self.gp.X[index]
-        Y_opt = self.gp.Y[index]
-
-        return X_opt, Y_opt
+        return self.gp.X[index], self.gp.Y[index]

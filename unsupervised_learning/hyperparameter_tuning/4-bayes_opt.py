@@ -51,8 +51,8 @@ class BayesianOptimization:
         Z = improvement / sigma_safe
 
         EI = (
-            improvement * norm.cdf(Z)
-            + sigma_safe * norm.pdf(Z)
+            improvement * norm.cdf(Z) +
+            sigma_safe * norm.pdf(Z)
         )
 
         EI = np.where(sigma == 0, 0, EI)
