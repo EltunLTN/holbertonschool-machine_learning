@@ -62,3 +62,5 @@ train_dataset = train_dataset.batch(32).shuffle(1000)
 - Use moderate augmentation strength to avoid degrading training
 - Combine multiple augmentations for better regularization
 - Monitor validation accuracy to ensure augmentation helps rather than hurts
+
+EltunLTN
