@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Module that flips an image horizontally"""
-import tensorflow as tf
+import tensorflow as tf  # type: ignore[import-not-found]
 
 
 def flip_image(image):
