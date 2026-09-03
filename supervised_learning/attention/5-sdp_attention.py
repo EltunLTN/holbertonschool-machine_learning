@@ -13,12 +13,15 @@ def sdp_attention(Q, K, V, mask=None):
         Q (tf.Tensor): query matrix of shape (..., seq_len_q, dk).
         K (tf.Tensor): key matrix of shape (..., seq_len_v, dk).
         V (tf.Tensor): value matrix of shape (..., seq_len_v, dv).
-        mask (tf.Tensor, optional): optional mask tensor. Defaults to None.
+        mask (tf.Tensor, optional): optional mask tensor.
+          Defaults to None.
 
     Returns:
         tuple:
-            output (tf.Tensor): scaled dot product attention of shape (..., seq_len_q, dv).
-            weights (tf.Tensor): attention weights of shape (..., seq_len_q, seq_len_v).
+            output (tf.Tensor): scaled dot product
+              attention of shape (..., seq_len_q, dv).
+            weights (tf.Tensor): attention weights
+              of shape (..., seq_len_q, seq_len_v).
     """
     dk = tf.cast(tf.shape(Q)[-1], tf.float32)
 
@@ -32,7 +35,7 @@ def sdp_attention(Q, K, V, mask=None):
     if mask is not None:
         scaled_attention_logits += (mask * -1e9)
 
-    # Softmap along the last dimension to get attention weights
+    # Softmax along the last dimension to get attention weights
     weights = tf.nn.softmax(scaled_attention_logits, axis=-1)
 
     # Multiply weights by V to get the output
