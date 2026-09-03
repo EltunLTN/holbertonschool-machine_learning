@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Module for RNNEncoder class used in sequence-to-sequence models with attention.
+Module for RNNEncoder class used in
+sequence-to-sequence models with attention.
 """
 import tensorflow as tf
 
@@ -35,7 +36,8 @@ class RNNEncoder(tf.keras.layers.Layer):
 
     def initialize_hidden_state(self):
         """
-        Initializes the hidden states for the RNN cell to a tensor of zeros.
+        Initializes the hidden states for the RNN
+        cell to a tensor of zeros.
 
         Returns:
             tf.Tensor: A tensor of shape (batch, units) with zeros.
@@ -47,13 +49,17 @@ class RNNEncoder(tf.keras.layers.Layer):
         Forward pass for the encoder layer.
 
         Args:
-            x (tf.Tensor): Input tensor of shape (batch, input_seq_len).
-            initial (tf.Tensor): Initial hidden state of shape (batch, units).
+            x (tf.Tensor): Input tensor of shape
+              (batch, input_seq_len).
+            initial (tf.Tensor): Initial hidden state
+              of shape (batch, units).
 
         Returns:
             tuple:
-                outputs (tf.Tensor): Outputs of shape (batch, input_seq_len, units).
-                hidden (tf.Tensor): Last hidden state of shape (batch, units).
+                outputs (tf.Tensor): Outputs of shape
+                  (batch, input_seq_len, units).
+                hidden (tf.Tensor): Last hidden state
+                  of shape (batch, units).
         """
         x = self.embedding(x)
         outputs, hidden = self.gru(x, initial_state=initial)
