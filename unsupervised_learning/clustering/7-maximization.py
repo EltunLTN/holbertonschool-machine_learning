@@ -1,26 +1,48 @@
 #!/usr/bin/env python3
+"""Calculates the maximization step in the EM algorithm for a GMM"""
 import numpy as np
 
 
 def maximization(X, g):
-    """Calculates the maximization step for a GMM."""
+    """
+    Calculates the maximization step in the EM algorithm for a GMM
+
+    X is a numpy.ndarray of shape (n, d) containing the data set
+    g is a numpy.ndarray of shape (k, n) containing the posterior
+        probabilities for each data point in each cluster
+
+    Returns: pi, m, S, or None, None, None on failure
+        pi is a numpy.ndarray of shape (k,) containing the updated priors
+            for each cluster
+        m is a numpy.ndarray of shape (k, d) containing the updated
+            centroid means for each cluster
+        S is a numpy.ndarray of shape (k, d, d) containing the updated
+            covariance matrices for each cluster
+    """
     if not isinstance(X, np.ndarray) or X.ndim != 2:
         return None, None, None
     if not isinstance(g, np.ndarray) or g.ndim != 2:
         return None, None, None
 
     n, d = X.shape
-    k = g.shape[0]
-    if g.shape[1] != n or k == 0:
+    k, n_g = g.shape
+
+    if n != n_g:
         return None, None, None
 
-    nk = np.sum(g, axis=1)
-    if np.any(nk <= 0) or not np.all(np.isfinite(nk)):
+    # Verify probabilities sum to 1 for each data point
+    sums = np.sum(g, axis=0)
+    if not np.allclose(sums, 1):
         return None, None, None
 
-    pi = nk / n
-    m = np.dot(g, X) / nk[:, None]
-    diff = X[None, :, :] - m[:, None, :]
-    S = np.einsum('kn,kni,knj->kij', g, diff, diff) / nk[:, None, None]
+    Nk = np.sum(g, axis=1)
+
+    pi = Nk / n
+    m = np.matmul(g, X) / Nk[:, np.newaxis]
+
+    S = np.zeros((k, d, d))
+    for i in range(k):
+        diff = X - m[i]
+        S[i] = np.matmul(g[i] * diff.T, diff) / Nk[i]
 
     return pi, m, S

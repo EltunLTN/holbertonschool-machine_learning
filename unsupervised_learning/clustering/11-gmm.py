@@ -1,17 +1,26 @@
 #!/usr/bin/env python3
+"""Calculates a GMM from a dataset using sklearn"""
 import sklearn.mixture
 
 
 def gmm(X, k):
-    """Calculates a Gaussian Mixture Model using scikit-learn."""
-    if not hasattr(X, 'ndim') or X.ndim != 2:
-        return None, None, None, None, None
-    if not isinstance(k, int) or k <= 0 or k > X.shape[0]:
-        return None, None, None, None, None
+    """
+    Calculates a GMM from a dataset
 
-    model = sklearn.mixture.GaussianMixture(
-        n_components=k, random_state=0)
-    model.fit(X)
+    X is a numpy.ndarray of shape (n, d) containing the dataset
+    k is the number of clusters
+
+    Returns: pi, m, S, clss, bic
+        pi is a numpy.ndarray of shape (k,) containing the cluster priors
+        m is a numpy.ndarray of shape (k, d) containing the centroid
+            means
+        S is a numpy.ndarray of shape (k, d, d) containing the covariance
+            matrices
+        clss is a numpy.ndarray of shape (n,) containing the cluster
+            indices for each data point
+        bic is the BIC value for the model
+    """
+    model = sklearn.mixture.GaussianMixture(n_components=k).fit(X)
 
     pi = model.weights_
     m = model.means_
