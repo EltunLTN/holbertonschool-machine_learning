@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Module that defines the WGAN_GP class."""
+"""Module that defines the WGAN_GP class with pre-trained weight replacement."""
 
 import tensorflow as tf
 from tensorflow import keras
@@ -58,6 +58,16 @@ class WGAN_GP(keras.Model):
             optimizer=discriminator.optimizer,
             loss=discriminator.loss
         )
+
+    def replace_weights(self, gen_h5, disc_h5):
+        """Replaces the generator and discriminator weights with pre-trained ones.
+
+        Args:
+            gen_h5 (str): Path to the generator weights file (.h5).
+            disc_h5 (str): Path to the discriminator weights file (.h5).
+        """
+        self.generator.load_weights(gen_h5)
+        self.discriminator.load_weights(disc_h5)
 
     def get_fake_sample(self, size=None, training=False):
         """Generates a batch of fake samples."""
