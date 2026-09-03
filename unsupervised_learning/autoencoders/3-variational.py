@@ -31,8 +31,8 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
     mu = keras.layers.Dense(latent_dims, activation=None)(x)
     log_var = keras.layers.Dense(latent_dims, activation=None)(x)
 
-    z = keras.layers.Lambda(sampling,
-                             output_shape=(latent_dims,))([mu, log_var])
+    z = keras.layers.Lambda(
+        sampling, output_shape=(latent_dims,))([mu, log_var])
 
     encoder = keras.Model(inputs, [z, mu, log_var])
 
@@ -49,8 +49,8 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
 
     def vae_loss(y_true, y_pred):
         """Computes reconstruction loss plus KL divergence loss"""
-        reconstruction_loss = keras.losses.binary_crossentropy(y_true,
-                                                                 y_pred)
+        reconstruction_loss = keras.losses.binary_crossentropy(
+            y_true, y_pred)
         reconstruction_loss *= input_dims
         kl_loss = 1 + log_var_out - K.square(mu_out) - K.exp(log_var_out)
         kl_loss = -0.5 * K.sum(kl_loss, axis=-1)
