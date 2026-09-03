@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Module for RNNDecoder class used in sequence-to-sequence models with attention.
+Module for RNNDecoder class used in
+sequence-to-sequence models with attention.
 """
 import tensorflow as tf
 SelfAttention = __import__('1-self_attention').SelfAttention
@@ -8,7 +9,8 @@ SelfAttention = __import__('1-self_attention').SelfAttention
 
 class RNNDecoder(tf.keras.layers.Layer):
     """
-    RNNDecoder class for machine translation decoding with attention.
+    RNNDecoder class for machine
+    translation decoding with attention.
     """
 
     def __init__(self, vocab, embedding, units, batch):
@@ -44,29 +46,24 @@ class RNNDecoder(tf.keras.layers.Layer):
         Forward pass for the decoder layer.
 
         Args:
-            x (tf.Tensor): tensor of shape (batch, 1) containing previous word index.
-            s_prev (tf.Tensor): tensor of shape (batch, units) containing previous hidden state.
-            hidden_states (tf.Tensor): tensor of shape (batch, input_seq_len, units) containing encoder outputs.
+            x (tf.Tensor): tensor of shape (batch, 1)
+              containing previous word index.
+            s_prev (tf.Tensor): tensor of shape (batch, units)
+              containing previous hidden state.
+            hidden_states (tf.Tensor): tensor of shape
+              (batch, input_seq_len, units) containing encoder outputs.
 
         Returns:
             tuple:
                 y (tf.Tensor): output word scores of shape (batch, vocab).
                 s (tf.Tensor): new decoder hidden state of shape (batch, units).
         """
-        # Calculate attention context vector
-        context, _ = self.attention(s_prev, hidden_states)
-
-        # Embed the previous word x
         x = self.embedding(x)
-
-        # Concatenate the context vector with x in that order
+        context, _ = self.attention(s_prev, hidden_states)
         context_expand = tf.expand_dims(context, 1)
         x = tf.concat([context_expand, x], axis=-1)
 
-        # Pass through GRU
         outputs, s = self.gru(x, initial_state=s_prev)
-
-        # Reshape outputs to pass through Dense layer F
         outputs = tf.reshape(outputs, (-1, outputs.shape[2]))
         y = self.F(outputs)
 

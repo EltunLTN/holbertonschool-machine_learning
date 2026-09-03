@@ -16,8 +16,8 @@ def positional_encoding(max_seq_len, dm):
     Returns:
         numpy.ndarray: positional encoding vectors of shape (max_seq_len, dm).
     """
-    pos = np.arange(max_seq_len, dtype=np.float32)
-    i = np.arange(dm, dtype=np.float32)
+    pos = np.arange(max_seq_len, dtype=np.float64)
+    i = np.arange(dm, dtype=np.float64)
 
     angle_rates = 1 / np.power(10000, (2 * (i // 2)) / dm)
     angle_rads = pos[:, np.newaxis] * angle_rates[np.newaxis, :]
