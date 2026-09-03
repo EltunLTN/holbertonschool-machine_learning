@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 """Module that builds and trains a gensim Word2Vec model"""
+import os
+import sys
+
+if os.environ.get('PYTHONHASHSEED') != '0':
+    os.environ['PYTHONHASHSEED'] = '0'
+    os.execvp(sys.executable, [sys.executable] + sys.argv)
+
 import gensim
 
 
