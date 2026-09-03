@@ -22,7 +22,7 @@ class RNNCell:
         h_next = np.tanh(np.matmul(concat, self.Wh) + self.bh)
 
         y_linear = np.matmul(h_next, self.Wy) + self.by
-        
+
         # Softmax activation
         exp_y = np.exp(y_linear - np.max(y_linear, axis=1, keepdims=True))
         y = exp_y / np.sum(exp_y, axis=1, keepdims=True)
