@@ -16,8 +16,8 @@ def word2vec_model(sentences, vector_size=100, min_count=5, window=5,
         min_count: minimum number of occurrences of a word for use in training
         window: maximum distance between the current and predicted word
         negative: size of negative sampling
-        cbow: boolean to determine the training type; True is for CBOW,
-              False is for Skip-gram
+        cbow: boolean to determine the training type; True for CBOW,
+              False for Skip-gram
         epochs: number of iterations to train over
         seed: seed for the random number generator
         workers: number of worker threads to train the model
@@ -25,10 +25,8 @@ def word2vec_model(sentences, vector_size=100, min_count=5, window=5,
     Returns:
         The trained model
     """
-    # Map cbow boolean to sg parameter (0 for CBOW, 1 for Skip-gram)
     sg = 0 if cbow else 1
 
-    # Initialize and train the model automatically by passing sentences
     model = gensim.models.Word2Vec(
         sentences=sentences,
         vector_size=vector_size,
