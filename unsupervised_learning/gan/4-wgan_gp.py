@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Module that defines the WGAN_GP class with pre-trained weight replacement."""
+"""Module that defines WGAN_GP class with pre-trained weight replacement."""
 
 import tensorflow as tf
 from tensorflow import keras
@@ -60,7 +60,7 @@ class WGAN_GP(keras.Model):
         )
 
     def replace_weights(self, gen_h5, disc_h5):
-        """Replaces the generator and discriminator weights with pre-trained ones.
+        """Replaces generator and discriminator weights with pre-trained ones.
 
         Args:
             gen_h5 (str): Path to the generator weights file (.h5).
