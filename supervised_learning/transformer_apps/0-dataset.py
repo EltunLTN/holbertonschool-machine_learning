@@ -4,7 +4,6 @@ Module for loading and preparing dataset and tokenizers for machine translation.
 """
 
 from setup import load_pt2en
-import tensorflow as tf
 from transformers import AutoTokenizer
 
 
