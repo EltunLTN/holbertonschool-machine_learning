@@ -39,8 +39,10 @@ def create_masks(inputs, target):
     Creates all masks for training/validation.
 
     Args:
-        inputs (tf.Tensor): Input sentence tensor of shape (batch_size, seq_len_in).
-        target (tf.Tensor): Target sentence tensor of shape (batch_size, seq_len_out).
+        inputs (tf.Tensor): Input sentence tensor
+            of shape (batch_size, seq_len_in).
+        target (tf.Tensor): Target sentence tensor
+            of shape (batch_size, seq_len_out).
 
     Returns:
         tuple: (encoder_mask, combined_mask, decoder_mask)
