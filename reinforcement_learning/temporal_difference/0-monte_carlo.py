@@ -37,8 +37,11 @@ def monte_carlo(
 
         episode = np.array(episode, dtype=int)
         G = 0
+        visited = set()
         for state, reward in episode[::-1]:
             G = reward + gamma * G
-            V[state] = V[state] + alpha * (G - V[state])
+            if state not in visited:
+                V[state] = V[state] + alpha * (G - V[state])
+                visited.add(state)
 
     return V
