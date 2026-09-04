@@ -1,36 +1,35 @@
 #!/usr/bin/env python3
-"""Module that builds and trains a gensim Word2Vec model"""
-import os
-import sys
-
-if os.environ.get('PYTHONHASHSEED') != '0':
-    os.environ['PYTHONHASHSEED'] = '0'
-    os.execvp(sys.executable, [sys.executable] + sys.argv)
+"""Module to create, build, and train a Gensim Word2Vec model."""
 
 import gensim
 
 
-def word2vec_model(sentences, vector_size=100, min_count=5, window=5,
-                    negative=5, cbow=True, epochs=5, seed=0, workers=1):
-    """
-    Creates, builds, and trains a gensim Word2Vec model
+def word2vec_model(
+    sentences,
+    vector_size=100,
+    min_count=5,
+    window=5,
+    negative=5,
+    cbow=True,
+    epochs=5,
+    seed=0,
+    workers=1,
+):
+    """Creates, builds, and trains a Gensim Word2Vec model.
 
     Args:
-        sentences: list of sentences to be trained on
-        vector_size: dimensionality of the embedding layer
-        min_count: minimum number of occurrences of a word for use
-            in training
-        window: maximum distance between the current and predicted
-            word within a sentence
-        negative: size of negative sampling
-        cbow: boolean to determine the training type;
-            True is for CBOW, False is for Skip-gram
-        epochs: number of iterations to train over
-        seed: seed for the random number generator
-        workers: number of worker threads to train the model
+        sentences: list of sentences to be trained on.
+        vector_size: dimensionality of the embedding layer.
+        min_count: minimum number of occurrences of a word for use in training.
+        window: maximum distance between current and predicted word.
+        negative: size of negative sampling.
+        cbow: boolean to determine training type (True: CBOW, False: Skip-gram)
+        epochs: number of iterations to train over.
+        seed: seed for the random number generator.
+        workers: number of worker threads to train the model.
 
     Returns:
-        the trained model
+        The trained Word2Vec model.
     """
     sg = 0 if cbow else 1
 
@@ -41,14 +40,9 @@ def word2vec_model(sentences, vector_size=100, min_count=5, window=5,
         window=window,
         negative=negative,
         sg=sg,
+        epochs=epochs,
         seed=seed,
-        workers=workers
-    )
-
-    model.train(
-        sentences,
-        total_examples=model.corpus_count,
-        epochs=epochs
+        workers=workers,
     )
 
     return model
