@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """
-Module for loading, preparing, and encoding datasets and tokenizers for machine translation.
+Module for loading, preparing, and encoding datasets and
+tokenizers for machine translation.
 """
-
 from setup import load_pt2en
 import tensorflow as tf
-from transformers import AutoTokenizer
+import transformers
 
 
 class Dataset:
     """
-    Dataset class that loads and preps dataset and tokenizers for machine translation.
+    Dataset class that loads and preps dataset and tokenizers
+    for machine translation.
     """
 
     def __init__(self):
@@ -23,14 +24,15 @@ class Dataset:
             self.data_train
         )
         self.data_train = self.data_train.map(self.tf_encode)
-        self.data_validate = self.data_valid.map(self.tf_encode)
+        self.data_valid = self.data_valid.map(self.tf_encode)
 
     def tokenize_dataset(self, data):
         """
         Creates sub-word tokenizers for the dataset.
 
         Args:
-            data (tf.data.Dataset): Dataset whose examples are (pt, en) tuples.
+            data (tf.data.Dataset): Dataset whose examples are
+                (pt, en) tuples.
 
         Returns:
             tuple: (tokenizer_pt, tokenizer_en)
@@ -43,23 +45,24 @@ class Dataset:
             for _, en in data:
                 yield en.numpy().decode('utf-8')
 
-        tokenizer_pt = AutoTokenizer.from_pretrained(
+        tokenizer_pt = transformers.AutoTokenizer.from_pretrained(
             'neuralmind/bert-base-portuguese-cased'
         )
         tokenizer_pt = tokenizer_pt.train_new_from_iterator(
-            pt_corpus(), vocab_size=2**13
+            pt_corpus(), vocab_size=2 ** 13
         )
-
-        tokenizer_en = AutoTokenizer.from_pretrained('bert-base-uncased')
+        tokenizer_en = transformers.AutoTokenizer.from_pretrained(
+            'bert-base-uncased'
+        )
         tokenizer_en = tokenizer_en.train_new_from_iterator(
-            en_corpus(), vocab_size=2**13
+            en_corpus(), vocab_size=2 ** 13
         )
-
         return tokenizer_pt, tokenizer_en
 
     def encode(self, pt, en):
         """
-        Encodes a translation into tokens including start and end tokens.
+        Encodes a translation into tokens including start and end
+        tokens.
 
         Args:
             pt (tf.Tensor): Portuguese sentence tensor.
@@ -78,18 +81,23 @@ class Dataset:
             en_str, add_special_tokens=False
         )
 
-        pt_tokens = [self.tokenizer_pt.vocab_size] + pt_tokens + [
-            self.tokenizer_pt.vocab_size + 1
-        ]
-        en_tokens = [self.tokenizer_en.vocab_size] + en_tokens + [
-            self.tokenizer_en.vocab_size + 1
-        ]
+        pt_tokens = (
+            [self.tokenizer_pt.vocab_size]
+            + pt_tokens
+            + [self.tokenizer_pt.vocab_size + 1]
+        )
+        en_tokens = (
+            [self.tokenizer_en.vocab_size]
+            + en_tokens
+            + [self.tokenizer_en.vocab_size + 1]
+        )
 
         return pt_tokens, en_tokens
 
     def tf_encode(self, pt, en):
         """
-        Acts as a tensorflow wrapper for the encode instance method.
+        Acts as a tensorflow wrapper for the encode instance
+        method.
 
         Args:
             pt (tf.Tensor): Portuguese sentence tensor.

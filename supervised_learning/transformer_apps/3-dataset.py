@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 """
-Module for loading, preparing, encoding, and
-building the data pipeline for machine translation.
+Module for loading, preparing, encoding, and building the data
+pipeline for machine translation.
 """
-
 from setup import load_pt2en
 import tensorflow as tf
-from transformers import AutoTokenizer
+import transformers
 
 
 class Dataset:
     """
-    Dataset class that loads, preps, encodes, and
-    builds a data pipeline for machine translation.
+    Dataset class that loads, preps, encodes, and builds a data
+    pipeline for machine translation.
     """
 
     def __init__(self, batch_size, max_len):
@@ -21,33 +20,27 @@ class Dataset:
 
         Args:
             batch_size (int): Batch size for training/validation.
-            max_len (int): Maximum number of tokens allowed per example sentence.
+            max_len (int): Maximum number of tokens allowed per
+                example sentence.
         """
         self.data_train = load_pt2en('train')
         self.data_valid = load_pt2en('validation')
-        self.data_validate = self.data_valid
         self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset(
             self.data_train
         )
 
         def encode_map_fn(pt, en):
-            """
-            Wrapper for tf.py_function to encode sentences.
-            """
+            """Wrapper for tf.py_function to encode sentences."""
             pt_tokens, en_tokens = tf.py_function(
-                self.encode,
-                [pt, en],
-                [tf.int64, tf.int64]
+                self.encode, [pt, en], [tf.int64, tf.int64]
             )
             pt_tokens.set_shape([None])
             en_tokens.set_shape([None])
             return pt_tokens, en_tokens
 
         def filter_max_len(pt, en):
-            """
-            Filters out examples where either sentence
-            exceeds max_len tokens.
-            """
+            """Filters out examples where either sentence exceeds
+            max_len tokens."""
             return tf.logical_and(
                 tf.size(pt) <= max_len,
                 tf.size(en) <= max_len
@@ -65,14 +58,14 @@ class Dataset:
         self.data_valid = self.data_valid.map(encode_map_fn)
         self.data_valid = self.data_valid.filter(filter_max_len)
         self.data_valid = self.data_valid.padded_batch(batch_size)
-        self.data_validate = self.data_valid
 
     def tokenize_dataset(self, data):
         """
         Creates sub-word tokenizers for the dataset.
 
         Args:
-            data (tf.data.Dataset): Dataset whose examples are (pt, en) tuples.
+            data (tf.data.Dataset): Dataset whose examples are
+                (pt, en) tuples.
 
         Returns:
             tuple: (tokenizer_pt, tokenizer_en)
@@ -85,24 +78,24 @@ class Dataset:
             for _, en in data:
                 yield en.numpy().decode('utf-8')
 
-        tokenizer_pt = AutoTokenizer.from_pretrained(
+        tokenizer_pt = transformers.AutoTokenizer.from_pretrained(
             'neuralmind/bert-base-portuguese-cased'
         )
         tokenizer_pt = tokenizer_pt.train_new_from_iterator(
-            pt_corpus(), vocab_size=2**13
+            pt_corpus(), vocab_size=213
         )
-
-        tokenizer_en = AutoTokenizer.from_pretrained('bert-base-uncased')
+        tokenizer_en = transformers.AutoTokenizer.from_pretrained(
+            'bert-base-uncased'
+        )
         tokenizer_en = tokenizer_en.train_new_from_iterator(
-            en_corpus(), vocab_size=2**13
+            en_corpus(), vocab_size=213
         )
-
         return tokenizer_pt, tokenizer_en
 
     def encode(self, pt, en):
         """
-        Encodes a translation into tokens including
-        start and end tokens.
+        Encodes a translation into tokens including start and end
+        tokens.
 
         Args:
             pt (tf.Tensor): Portuguese sentence tensor.
@@ -121,11 +114,15 @@ class Dataset:
             en_str, add_special_tokens=False
         )
 
-        pt_tokens = [self.tokenizer_pt.vocab_size] + pt_tokens + [
-            self.tokenizer_pt.vocab_size + 1
-        ]
-        en_tokens = [self.tokenizer_en.vocab_size] + en_tokens + [
-            self.tokenizer_en.vocab_size + 1
-        ]
+        pt_tokens = (
+            [self.tokenizer_pt.vocab_size]
+            + pt_tokens
+            + [self.tokenizer_pt.vocab_size + 1]
+        )
+        en_tokens = (
+            [self.tokenizer_en.vocab_size]
+            + en_tokens
+            + [self.tokenizer_en.vocab_size + 1]
+        )
 
         return pt_tokens, en_tokens
