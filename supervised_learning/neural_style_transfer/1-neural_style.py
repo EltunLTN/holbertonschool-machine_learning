@@ -38,25 +38,16 @@ class NST:
         self.content_image = self.scale_image(content_image)
         self.alpha = alpha
         self.beta = beta
+        self.load_model()
 
-    @staticmethod
-    def scale_image(image):
-        """Rescale an image to 512 pixels on its largest side."""
-        if (not isinstance(image, np.ndarray) or image.ndim != 3 or
-                image.shape[-1] != 3):
-            raise TypeError(
-                'image must be a numpy.ndarray with shape (h, w, 3)'
-            )
-        h, w = image.shape[:2]
-        if h >= w:
-            nh = 512
-            nw = int(w * 512 / h)
-        else:
-            nw = 512
-            nh = int(h * 512 / w)
-        image = tf.convert_to_tensor(image, dtype=tf.float32)
-        image = tf.image.resize(
-            image, (nh, nw), method='bicubic'
+    def load_model(self):
+        """Load VGG19 and build the feature-extraction model."""
+        vgg = tf.keras.applications.VGG19(
+            include_top=False, weights='imagenet'
         )
-        image = image / 255.0
-        return tf.expand_dims(image, axis=0)
+        vgg.trainable = False
+        outputs = [
+            vgg.get_layer(name).output
+            for name in self.style_layers + [self.content_layer]
+        ]
+        self.model = tf.keras.Model(vgg.input, outputs)
