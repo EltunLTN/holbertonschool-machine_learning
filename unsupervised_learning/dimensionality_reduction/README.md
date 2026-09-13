@@ -1,105 +1,65 @@
-# Unsupervised Learning - Dimensionality Reduction
+# Dimensionality Reduction
 
-This directory contains implementations of dimensionality reduction techniques from the Holberton machine learning curriculum. Dimensionality reduction is used to reduce the number of features in high-dimensional datasets while preserving important information.
-
-## Learning Objectives
-
-- Understand Principal Component Analysis (PCA) and its mathematical foundations
-- Implement PCA from scratch using eigendecomposition
-- Apply dimensionality reduction to high-dimensional data
-- Use PCA for data visualization and feature extraction
-- Understand variance preservation and explained variance ratio
-- Reduce computational complexity and storage requirements
-
-## Files
-
-- `0-pca.py`: Defines `pca(X, var=0.95)` — compute PCA transformation preserving specified variance
+This project implements two dimensionality reduction techniques from
+scratch using only `numpy`: **PCA** (Principal Component Analysis)
+and **t-SNE** (t-Distributed Stochastic Neighbor Embedding).
 
 ## Requirements
 
-- Python 3.x
-- NumPy
-- scikit-learn (for comparison/validation)
-- `pycodestyle` style compliance where required
+* Ubuntu 20.04 LTS, Python 3.9
+* `numpy` 1.25.2
+* Style: `pycodestyle` 2.11.1
+* Every file starts with `#!/usr/bin/env python3`, ends with a
+  newline, is executable, and is fully documented (module, class,
+  and function docstrings).
+* No imports besides `numpy` are used, and functions imported
+  between files are explicitly noted per task.
 
-## Key Concepts
+## Files
 
-**Principal Component Analysis (PCA)**: 
-- Unsupervised linear transformation that finds principal components (directions of maximum variance)
-- Components are orthogonal to each other
-- Ranked by amount of variance explained
+| File                  | Description |
+|-----------------------|-------------|
+| `0-pca.py`            | `pca(X, var=0.95)` — PCA that keeps a given fraction of the variance, returning the weights matrix `W`. |
+| `1-pca.py`            | `pca(X, ndim)` — PCA that reduces `X` to a fixed number of dimensions, returning the transformed data `T`. |
+| `2-P_init.py`         | `P_init(X, perplexity)` — initializes the pairwise squared distance matrix `D`, the affinity matrix `P`, the `beta` values, and the target Shannon entropy `H`. |
+| `3-entropy.py`        | `HP(Di, beta)` — computes the Shannon entropy and P affinities for a single point's distance row. |
+| `4-P_affinities.py`   | `P_affinities(X, tol=1e-5, perplexity=30.0)` — binary-searches `beta` per point to match the target perplexity, then symmetrizes and normalizes `P`. |
+| `5-Q_affinities.py`   | `Q_affinities(Y)` — computes the low-dimensional Q affinities using the Student t-distribution kernel. |
+| `6-grads.py`          | `grads(Y, P)` — computes the gradient of the t-SNE cost with respect to `Y`. |
+| `7-cost.py`           | `cost(P, Q)` — computes the KL-divergence cost between `P` and `Q`. |
+| `8-tsne.py`           | `tsne(X, ndims=2, idims=50, perplexity=30.0, iterations=1000, lr=500)` — full t-SNE pipeline: PCA preprocessing, early exaggeration, and momentum-based gradient descent. |
 
-**Variance Preservation**:
-- Parameter `var` specifies minimum fraction of variance to preserve (e.g., 0.95 = 95%)
-- Fewer components needed for lower variance thresholds
-- Trades reconstruction accuracy for dimensionality reduction
+## Data
 
-**Principal Components**:
-- Eigenvectors of the covariance matrix
-- Sorted by corresponding eigenvalues (variance explained)
-- First component explains most variance, second explains next most, etc.
-
-**Explained Variance Ratio**: 
-- Fraction of total variance explained by each component
-- Cumulative ratio helps determine number of components needed
-
-**Applications**:
-1. Data visualization (project to 2D/3D for plotting)
-2. Feature extraction (use reduced features for downstream models)
-3. Noise reduction (discard low-variance components)
-4. Computational efficiency (reduce memory and training time)
+Test scripts expect `mnist2500_X.txt` and `mnist2500_labels.txt` in
+the working directory (a 2500-sample, 784-feature subset of MNIST).
 
 ## Usage
 
-```python
-import numpy as np
-from dimensionality_reduction import pca
-
-# Load high-dimensional data (e.g., 10000 samples, 784 features)
-X = np.random.randn(10000, 784)
-
-# Apply PCA preserving 95% of variance
-X_reduced = pca(X, var=0.95)
-print(X_reduced.shape)  # Will have fewer than 784 features
-
-# For visualization
-X_2d = pca(X, var=0.99)  # Or specify n_components
-# Can then plot X_2d[:, 0] vs X_2d[:, 1]
+```bash
+./0-main.py
+./1-main.py
+# etc.
 ```
 
-## Comparison with Other Techniques
+Each `N-main.py` script is a standalone example that imports and
+runs the corresponding `N-*.py` module.
 
-| Technique | Type | Interpretability | Speed | Non-linear |
-|-----------|------|------------------|-------|-----------|
-| **PCA** | Linear | High | Very Fast | No |
-| **t-SNE** | Non-linear | Low | Slow | Yes |
-| **UMAP** | Non-linear | Medium | Fast | Yes |
-| **Factor Analysis** | Linear | High | Fast | No |
+## Notes on the algorithm
 
-## Implementation Steps
-
-1. **Standardize data**: Center and scale features to zero mean and unit variance
-2. **Compute covariance matrix**: Cov = (X^T * X) / (n-1)
-3. **Eigendecomposition**: Find eigenvalues and eigenvectors
-4. **Sort by variance**: Order eigenvectors by descending eigenvalues
-5. **Select components**: Choose components that preserve required variance
-6. **Transform data**: Project data onto selected components: X_new = X * W
-
-## Advantages and Limitations
-
-**Advantages**:
-- Linear, simple, and interpretable
-- Very fast computation
-- Effective for many applications
-- Well-understood mathematically
-
-**Limitations**:
-- Linear only (can't capture non-linear structures)
-- Assumes variance = information (not always true)
-- Sensitive to feature scaling
-- Original features harder to interpret after transformation
-
-## References
-
-- Turk, M., & Pentland, A. (1991). Eigenfaces for recognition
-- Jolliffe, I. T. (2002). Principal Component Analysis (comprehensive reference)
+* **PCA** uses SVD (`np.linalg.svd`) on the mean-centered data; the
+  right singular vectors give the principal directions, and the
+  cumulative explained-variance ratio picks how many components to
+  keep.
+* **t-SNE** follows Algorithm 1 of van der Maaten & Hinton (2008):
+  * P affinities are computed per-point with a binary search on
+    `beta = 1 / (2 * sigma^2)` so every conditional distribution
+    matches the target perplexity within `tol`.
+  * Q affinities use the Student t-distribution (1 degree of
+    freedom) as a heavier-tailed kernel in the low-dimensional
+    space.
+  * The gradient descent uses momentum (`0.5` for the first 20
+    iterations, `0.8` after) and early exaggeration (P values
+    multiplied by 4 for the first 100 iterations) to help escape
+    poor local optima early in training.
+  * `Y` is re-centered (mean subtracted) after every iteration.

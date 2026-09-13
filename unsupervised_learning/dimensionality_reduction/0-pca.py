@@ -1,28 +1,27 @@
 #!/usr/bin/env python3
-"""Module containing a function that performs PCA."""
-
+"""Defines a function that performs PCA on a dataset to maintain
+a given fraction of its original variance."""
 import numpy as np
 
 
 def pca(X, var=0.95):
-    """Perform Principal Component Analysis on a dataset.
+    """Performs PCA on a dataset.
 
     Args:
-        X: numpy.ndarray of shape (n, d) containing the dataset.
-        var: Fraction of variance to preserve.
+        X (numpy.ndarray): array of shape (n, d) where n is the
+            number of data points and d is the number of dimensions
+            in each point. All dimensions have a mean of 0 across
+            all data points.
+        var (float): fraction of the variance that the PCA
+            transformation should maintain.
 
     Returns:
-        numpy.ndarray of shape (d, nd) containing the weights matrix.
+        numpy.ndarray: the weights matrix W of shape (d, nd), where
+            nd is the new dimensionality of the transformed X, that
+            maintains var fraction of X's original variance.
     """
-    _, S, Vt = np.linalg.svd(X, full_matrices=False)
-
-    explained_variance = S ** 2
-    explained_variance /= np.sum(explained_variance)
-
-    cumulative_variance = np.cumsum(explained_variance)
-
-    nd = np.searchsorted(cumulative_variance, var) + 1
-
-    W = Vt[:nd].T
-
+    u, s, vh = np.linalg.svd(X)
+    cum_var = np.cumsum(s) / np.sum(s)
+    nd = np.argwhere(cum_var >= var)[0, 0] + 1
+    W = vh[:nd].T
     return W
